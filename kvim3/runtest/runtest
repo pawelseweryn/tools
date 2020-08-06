@@ -1,0 +1,36 @@
+#!/bin/bash
+
+sudo ./update write ./build/u-boot.bin 0xfffa0000 0x10000
+sudo ./update run 0xfffa0000
+
+for i in {1..3}
+do
+    echo -n "."
+    sleep 1
+done
+
+sudo ./update bl2_boot ./build/u-boot.bin
+
+for i in {1..4}
+do
+       echo -n "."
+       sleep 1
+done
+
+sudo ./update bulkcmd "echo 12345"
+sleep 1
+
+sudo ./update bulkcmd "i2c reset"
+sudo ./update bulkcmd "disk_initial 0"
+sudo ./update bulkcmd "setenv reboot_mode cold_boot"
+sudo ./update bulkcmd "emmc dtb_read 0x1000000 0x40000"
+sudo ./update bulkcmd "fdt addr 0x1000000"
+sudo ./update bulkcmd "sspi"
+sudo ./update bulkcmd "sf probe"
+sudo ./update bulkcmd "run bcb_cmd"
+sudo ./update bulkcmd "run burn_mac"
+sudo ./update bulkcmd "run factory_reset_poweroff_protect"
+sudo ./update bulkcmd "run hwver_check"
+sudo ./update bulkcmd "run spi_check"
+sudo ./update bulkcmd "run storeargs"
+
